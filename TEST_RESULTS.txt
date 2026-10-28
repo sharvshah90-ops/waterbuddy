@@ -1,0 +1,47 @@
+WATERBUDDY LOCAL VERIFICATION
+Date: 28 October 2026
+Python 3.12; Streamlit 1.66.0
+
+LOGIC TESTS
+test_container_estimates (test_waterbuddy.Calculations.test_container_estimates) ... ok
+test_empty_half_complete_over_goal (test_waterbuddy.Calculations.test_empty_half_complete_over_goal) ... ok
+test_exact_milestone_boundaries (test_waterbuddy.Calculations.test_exact_milestone_boundaries) ... ok
+test_invalid_amounts_leave_state_unchanged (test_waterbuddy.Calculations.test_invalid_amounts_leave_state_unchanged) ... ok
+test_invalid_goals (test_waterbuddy.Calculations.test_invalid_goals) ... ok
+test_logging_and_undo (test_waterbuddy.Calculations.test_logging_and_undo) ... ok
+test_points_capped_and_undo_recalculates (test_waterbuddy.Calculations.test_points_capped_and_undo_recalculates) ... ok
+test_real_calendar_streaks_and_gaps (test_waterbuddy.Calculations.test_real_calendar_streaks_and_gaps) ... ok
+test_reset_preserves_prior_days_and_settings (test_waterbuddy.Calculations.test_reset_preserves_prior_days_and_settings) ... ok
+test_rollover_preserves_history_and_no_fake_day (test_waterbuddy.Calculations.test_rollover_preserves_history_and_no_fake_day) ... ok
+test_week_has_seven_dates_without_inventing_records (test_waterbuddy.Calculations.test_week_has_seven_dates_without_inventing_records) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.000s
+
+OK
+
+STREAMLIT APPTEST
+PASS Initial page renders
+PASS Quick logging
+PASS Custom goal recalculates
+PASS 50 percent mascot
+PASS 75 percent mascot
+PASS 100 percent completion
+PASS Undo
+PASS Cancel reset preserves logs
+PASS Confirm reset clears logs
+PASS Age selection suggests goal
+PASS Custom logging
+PASS Container logging
+PASS Progress page and exports
+PASS Rewards page
+PASS About page and sources
+PASS Due reminder appears while Home is active
+PASS Snooze hides reminder
+PASS Quiet hours suppress reminder
+PASS Completed goal suppresses reminder
+PASS Completion unlocks cosmetic reward
+INTERFACE CHECKS PASSED
+
+Browser: Home opened at localhost:8501; age selector, metrics, mascot and progress display visually inspected.
+Public deployment and mobile behavior remain unverified.

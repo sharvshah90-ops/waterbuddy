@@ -68,9 +68,9 @@ with st.sidebar:
         st.caption("Default: India UTC +5:30. Changing the clock can change the recorded date.")
     st.caption("No account needed. Records stay in this Streamlit session on the server. A disconnected or restarted session may lose them. Download a backup below.")
 
-st.markdown('<div class="eyebrow">SMALL SIPS · STEADY HABITS</div>',unsafe_allow_html=True)
+st.markdown('<div class="eyebrow">DAILY WATER TRACKER</div>',unsafe_allow_html=True)
 st.title("WaterBuddy")
-st.write("A little water. A little progress. A buddy cheering you on.")
+st.write("Log your drinks and see how you are doing today.")
 nav=st.radio("Explore",["Home","Progress","Rewards","About"],horizontal=True,label_visibility="collapsed")
 p=current(model); stats=statistics(model)
 
@@ -163,7 +163,7 @@ elif nav=="Progress":
     st.caption("Backups preserve a readable record. This version does not restore backups into the app.")
 
 elif nav=="Rewards":
-    st.subheader("Small achievements worth celebrating")
+    st.subheader("Your progress and badges")
     a,b,c=st.columns(3)
     a.metric("AquaPoints this session",stats["points"])
     b.metric("Current calendar streak",f'{stats["streak"]} days')
@@ -177,10 +177,11 @@ elif nav=="Rewards":
     st.caption("Streaks use consecutive real dates with a completed saved goal. No sample streaks, points or history are preloaded.")
 
 else:
-    st.subheader("Friendly guidance with clear limits")
+    st.subheader("About WaterBuddy")
     st.write("WaterBuddy is a Python learning project. Its age presets are illustrative starting goals carried forward from the storyboard: 1,200 / 1,700 / 2,250 / 1,800 ml. They are not universal health standards or personalised drinking-water prescriptions.")
     st.write("EFSA reference values describe TOTAL water from food and all drinks: 1,600 ml for ages 4-8; 1,900 ml for girls and 2,100 ml for boys aged 9-13; and 2,000 ml for females and 2,500 ml for males aged 14 and over, including older adults. This app records only the water you log. Do not treat a shortfall against a total-water reference as an instruction to drink that much plain water.")
     st.write("Needs vary with activity, climate and health. Follow individual medical advice, including any fluid restriction. Children should choose a suitable goal with an adult. Spread drinks through the day.")
     st.markdown("[EFSA reference values](https://www.efsa.europa.eu/sites/default/files/2017_09_DRVs_summary_report.pdf) · [CDC water guidance](https://www.cdc.gov/healthy-weight-growth/water-healthy-drinks/)")
     st.write("Built with Streamlit widgets and session_state. A Python-drawn SVG drop replaces desktop Turtle animation so the same mascot reactions work in a browser on Streamlit Cloud.")
     st.caption("FA1 storyboard and FA2 app share the same four sections, controls, formulas, reward rules and reset behavior.")
+
