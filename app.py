@@ -55,6 +55,8 @@ h3{font-size:1.35rem!important}
 .status-pill{background:#eee9fa;border-radius:30px;padding:7px 14px;color:#665580;font-size:12px;font-weight:600}
 @media(max-width:700px){.block-container{padding:3rem 1rem 2rem}.buddy{padding:24px;gap:14px;flex-wrap:wrap}.buddy strong{font-size:52px}.ring{width:145px;height:145px}.ring-inner{width:125px;height:125px}.ring img{width:100px}h1{font-size:2.4rem!important}[data-testid="stRadio"] label{padding:7px 10px!important}}
 @media(prefers-reduced-motion:reduce){.stButton>button{transition:none}}
+[data-testid="stSidebar"] [data-testid="stRadio"]>div[role="radiogroup"]{width:100%;background:transparent;padding:0;gap:6px}
+[data-testid="stSidebar"] [data-testid="stRadio"] label{width:100%;padding:11px 18px!important}
 </style>""",unsafe_allow_html=True)
 
 def now():
@@ -86,41 +88,86 @@ def log(amount,source):
     st.session_state.last_log=datetime.now(timezone.utc).timestamp()
     st.session_state.snooze=0
 
-with st.sidebar:
-    st.markdown("### 💧 WaterBuddy")
-    st.caption("A little progress, every day.")
+# Keep preferences when their widgets are not displayed on the current page.
+for setting in ("age","goal","glass","bottle","reminders","interval","sound_alarm","day_start","day_end","busy_hours","utc_offset"):
+    if setting in st.session_state:
+        st.session_state[setting]=st.session_state[setting]
+
+def profile_settings():
     st.selectbox("Age group",list(AGE_GOALS),key="age",on_change=age_changed)
     st.caption("Suggested starting goal: {:,} ml".format(AGE_GOALS[model["age"]]))
     st.number_input("My daily goal (ml)",min_value=250,max_value=5000,step=50,key="goal",on_change=goal_changed)
     with st.expander("About your goal"):
         st.caption("These are editable classroom logging goals, not medical prescriptions. Ask a parent or clinician if you need help choosing one.")
+
+def container_settings():
     with st.expander("My containers"):
         st.number_input("Glass size (ml)",100,1000,300,25,key="glass")
         st.number_input("Bottle size (ml)",250,2000,1000,50,key="bottle")
-    with st.expander("Reminders and clock"):
-        st.checkbox("Show in-app reminders",key="reminders")
-        st.selectbox("Reminder interval (minutes)",[15,30,60,90,120,180],index=2,key="interval")
-        st.checkbox("Sound alarm when due",key="sound_alarm")
-        st.caption("Tap play below once to test your sound. Your browser may block automatic audio. Keep Home open and connected for alarms; closed-tab alarms are not supported.")
-        st.audio(alarm_wav(),format="audio/wav")
-        st.number_input("Day starts at",0,22,7,key="day_start")
-        st.number_input("Day ends at",1,24,22,key="day_end")
-        st.multiselect("Busy hours to skip",list(range(24)),format_func=lambda h:f"{h:02d}:00–{h+1:02d}:00",key="busy_hours")
-        st.caption("Reminders pause outside your selected day and during busy hours. Change your schedule on the Plan page or here.")
-        st.number_input("Local UTC offset (hours)",-12.0,14.0,5.5,0.5,key="utc_offset")
-        st.caption("Default: India UTC +5:30. Changing the clock can change the recorded date.")
-    st.caption("No account needed. Records stay in this Streamlit session on the server. A disconnected or restarted session may lose them. Download a backup below.")
+
+def routine_settings():
+    st.checkbox("Show in-app reminders",key="reminders")
+    st.selectbox("Reminder interval (minutes)",[15,30,60,90,120,180],index=2,key="interval")
+    st.checkbox("Sound alarm when due",key="sound_alarm")
+    st.caption("Tap play below once to test your sound. Your browser may block automatic audio. Keep Home open and connected for alarms; closed-tab alarms are not supported.")
+    st.audio(alarm_wav(),format="audio/wav")
+    st.number_input("Day starts at",0,22,7,key="day_start")
+    st.number_input("Day ends at",1,24,22,key="day_end")
+    st.multiselect("Busy hours to skip",list(range(24)),format_func=lambda h:f"{h:02d}:00–{h+1:02d}:00",key="busy_hours")
+    st.caption("Reminders pause outside your selected day and during busy hours. See your schedule on Plan; edit it here in Settings.")
+    st.number_input("Local UTC offset (hours)",-12.0,14.0,5.5,0.5,key="utc_offset")
+    st.caption("Default: India UTC +5:30. Changing the clock can change the recorded date.")
+
+if not st.session_state.get("setup_done",False):
+    step=st.session_state.get("setup_step",0)
+    st.markdown('<div class="eyebrow">WELCOME TO WATERBUDDY</div>',unsafe_allow_html=True)
+    st.title("Let's make it yours.")
+    st.write("A quick setup, then your daily dashboard is ready.")
+    st.progress((step+1)/3,text=f"Step {step+1} of 3 · "+["Your goal","Your routine","Ready to start"][step])
+    if step==0:
+        st.subheader("Choose your starting goal")
+        profile_settings()
+        st.caption("You can change these details later in Settings.")
+    elif step==1:
+        st.subheader("Make space in your day")
+        routine_settings()
+    else:
+        st.subheader("Your setup at a glance")
+        st.write(f"Age group: {model['age']}")
+        st.write(f"Daily logging goal: {model['goal']:,} ml")
+        st.write(f"Day: {st.session_state.get('day_start',7):02d}:00 to {st.session_state.get('day_end',22):02d}:00")
+        st.write(f"Reminder spacing: {st.session_state.get('interval',60)} minutes")
+        st.caption("Optional alarms work while Home is open and connected. No account is needed; download a backup to keep your records.")
+    back,forward=st.columns(2)
+    if step>0 and back.button("Back",use_container_width=True):
+        st.session_state.setup_step=step-1; st.rerun()
+    if forward.button("Start tracking" if step==2 else "Continue",type="primary",use_container_width=True):
+        if step==1 and st.session_state.get('day_start',7)>=st.session_state.get('day_end',22):
+            st.error("Choose an end time later than your start time.")
+        elif step<2:
+            st.session_state.setup_step=step+1; st.rerun()
+        else:
+            st.session_state.setup_done=True; st.rerun()
+    st.stop()
+
+with st.sidebar:
+    st.markdown("### 💧 WaterBuddy")
+    st.caption("A little progress, every day.")
+    nav=st.radio("Explore",["Home","Plan","Progress","Rewards","Settings","About"],label_visibility="collapsed")
+    st.divider()
+    st.caption(f"YOUR DAILY GOAL · {model['goal']:,} ml")
+    st.caption("Change your goal, routine or reminders in Settings.")
+    st.caption("Records are stored in this session. Download a backup in Progress to keep them.")
 
 st.markdown('<div class="eyebrow">DAILY WATER TRACKER</div>',unsafe_allow_html=True)
 st.title("WaterBuddy")
 st.caption("Your water. Your routine. One easy place to keep track.")
-nav=st.radio("Explore",["Home","Plan","Progress","Rewards","About"],horizontal=True,label_visibility="collapsed")
 p=current(model); stats=statistics(model)
 start=st.session_state.get("day_start",7); end=st.session_state.get("day_end",22)
 busy=st.session_state.get("busy_hours",[])
 try: slots=plan_slots(start,end,st.session_state.get("interval",60),busy)
 except ValueError:
-    slots=[]; st.warning("Your day must end later than it starts. Fix the times in Reminders and clock to enable your plan.")
+    slots=[]; st.warning("Your day must end later than it starts. Fix the times in Settings to enable your plan.")
 
 def mascot_svg(state,fill):
     mouth={"ready":"M64 101 Q80 106 96 101","smile":"M63 99 Q80 119 97 99",
@@ -195,9 +242,17 @@ if nav=="Home":
     reminder_panel()
     st.caption("Tip of the day: "+TIPS[now().date().toordinal()%len(TIPS)])
 
+elif nav=="Settings":
+    st.subheader("Your settings")
+    st.write("Adjust your details here. Changes save for this session and your logged drinks stay intact.")
+    with st.expander("Profile and daily goal",expanded=True): profile_settings()
+    with st.expander("Routine and reminders"): routine_settings()
+    container_settings()
+    st.caption("Your preferences stay in this session. Water backups restore water records; schedule preferences are kept separately.")
+
 elif nav=="Plan":
     st.subheader("A plan that fits your day")
-    st.write("Set your waking hours, reminder spacing and busy hours in the sidebar. The plan leaves out lessons, work or travel hours you want to keep quiet.")
+    st.write("Set your waking hours, reminder spacing and busy hours in Settings. The plan leaves out lessons, work or travel hours you want to keep quiet.")
     st.caption("This is a rule-based schedule from your choices, not an AI health assessment. It never increases your chosen goal.")
     if slots:
         minute=now().hour*60+now().minute
@@ -268,5 +323,6 @@ else:
     st.write("Needs vary with activity, climate and health. Follow individual medical advice, including any fluid restriction. Children should choose a suitable goal with an adult. Spread drinks through the day.")
     st.markdown("[EFSA reference values](https://www.efsa.europa.eu/sites/default/files/2017_09_DRVs_summary_report.pdf) · [CDC water guidance](https://www.cdc.gov/healthy-weight-growth/water-healthy-drinks/)")
     st.write("Built with Streamlit widgets and session_state. A Python-drawn SVG drop replaces desktop Turtle animation so the same mascot reactions work in a browser on Streamlit Cloud.")
-    st.caption("FA1 storyboard and FA2 app share the same five sections, controls, formulas, reward rules and reset behavior.")
+    st.caption("FA1 storyboard and FA2 app share the same six sections, controls, formulas, reward rules and reset behavior.")
+
 

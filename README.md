@@ -23,7 +23,7 @@ Plan builds check-ins using your waking hours, reminder spacing and busy-hour ex
 
 ## Personal schedule and sound alarms
 
-In Reminders and clock, choose your day start/end and spacing (15, 30, 60, 90, 120 or 180 minutes). Select busy hours to skip, such as lessons or work. Plan shows the available check-ins, next planned time and a flexible goal-by-time comparison. It uses your choices, not an AI health assessment. Overnight schedules are not supported. If all hours are busy there are no slots. Missed slots never count as drinks or create a catch-up drinking target.
+In Settings > Routine and reminders, choose your day start/end and spacing (15, 30, 60, 90, 120 or 180 minutes). Select busy hours to skip, such as lessons or work. Plan shows the available check-ins, next planned time and a flexible goal-by-time comparison. It uses your choices, not an AI health assessment. Overnight schedules are not supported. If all hours are busy there are no slots. Missed slots never count as drinks or create a catch-up drinking target.
 
 Enable Show in-app reminders and optionally Sound alarm when due. Tap play in the audio player to test the sound. Home checks every 60 seconds. Reminders require: enabled setting, waking hours, non-busy hour, incomplete goal, elapsed interval since last log/session start and expired snooze. Sound repeats at most once per chosen interval. Logging restarts the interval; snooze hides reminders for 15 minutes.
 
@@ -48,7 +48,7 @@ python -m unittest -v test_waterbuddy.py test_planning.py
 python test_interface.py
 ```
 
-Version 2 passed 19 pure logic tests and 23 Streamlit AppTest checkpoints locally on 2 November 2026. See TEST_RESULTS.txt. Sound delivery still depends on browser/device settings.
+Version 2 passed 19 pure logic tests and 20 Streamlit AppTest checkpoints locally on 2 November 2026. See TEST_RESULTS.txt. Sound delivery still depends on browser/device settings.
 
 ## Deployment and submission
 
@@ -59,3 +59,10 @@ GitHub main is linked to Streamlit Cloud using app.py and Python 3.12. Deploy ap
 - https://www.efsa.europa.eu/sites/default/files/2017_09_DRVs_summary_report.pdf
 - https://www.cdc.gov/healthy-weight-growth/water-healthy-drinks/
 - https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy
+
+## UI refresh
+The dashboard uses deep teal, mint, warm off-white and lavender, a circular progress ring and three adjacent quick-log sizes. Goal guidance and custom entry are expandable. The original hydration calculations, schedule and alarm rules are unchanged.
+
+## First-use setup and Settings
+New sessions start with three steps: choose an age group and goal, set a routine, then review and start tracking. Back preserves your entries. Home has no profile controls. Settings contains your profile, routine, reminders and containers. Changes keep existing water logs; preferences remain in the current session across pages. A new or expired session requires setup again.
+
