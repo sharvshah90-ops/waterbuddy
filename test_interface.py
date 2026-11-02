@@ -55,7 +55,21 @@ assert not any('Your buddy is here' in i.value for i in at.info);clean('Complete
 next(r for r in at.radio if r.label=='Explore').set_value('Rewards').run()
 next(s for s in at.selectbox if s.label=="Choose your buddy's celebration").select('Party hat').run()
 assert any('celebration accessory' in s.value for s in at.success);clean('Completion unlocks cosmetic reward')
+next(r for r in at.radio if r.label=='Explore').set_value('Plan').run()
+number('Day starts at').set_value(8).run()
+number('Day ends at').set_value(12).run()
+at.multiselect[0].set_value([9,10]).run()
+assert not at.exception
+assert any(m.value=='2' for m in at.metric)
+clean('Personal plan skips busy hours')
+at.multiselect[0].set_value([8,9,10,11]).run()
+assert any('No available' in i.value for i in at.info)
+clean('Fully busy day has no check-ins')
+number('Day starts at').set_value(15).run()
+assert len(at.warning)>0 and not at.exception
+clean('Invalid day shows useful warning')
 print('INTERFACE CHECKS PASSED')
+
 
 
 
