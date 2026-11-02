@@ -9,7 +9,7 @@ import struct
 import wave
 from planning import plan_slots, reminder_due, restore_backup
 import streamlit as st
-from hydration import (AGE_GOALS,TIPS,new_model,ensure_day,current,add_water,
+from hydration import (LOG_LIMIT,buddy_line,AGE_GOALS,TIPS,new_model,ensure_day,current,add_water,
                        undo,reset_today,container_amount,milestone,statistics,weekly,day_points)
 
 def alarm_wav():
@@ -84,7 +84,11 @@ def goal_changed():
 
 def log(amount,source):
     ensure_day(model,now().date().isoformat())
-    add_water(model,amount,now().strftime("%H:%M:%S"),source)
+    try:
+        add_water(model,amount,now().strftime("%H:%M:%S"),source)
+    except ValueError as error:
+        st.session_state.log_error=str(error)
+        return
     st.session_state.last_log=datetime.now(timezone.utc).timestamp()
     st.session_state.snooze=0
 
@@ -184,13 +188,20 @@ def mascot_svg(state,fill):
 if nav=="Home":
     st.caption(now().strftime("%A %d %B %Y")+" · Log only what you drank")
     state,message=milestone(p["percent"])
+    count=len(model["days"][model["day"]]["logs"])
+    reaction=buddy_line(p["total"],model["goal"],count)
+    if p["total"]>=LOG_LIMIT:
+        state="ready"
+        st.warning("10,000 ml logging cap reached. This is a software limit, not a drinking goal. Check your entries; Undo and Reset still work.")
+    if "log_error" in st.session_state:
+        st.warning(st.session_state.pop("log_error"))
     svg=base64.b64encode(mascot_svg(state,p["fill"]).encode()).decode()
-    st.markdown(f'<div class="buddy"><div><p class="hero-label">YOUR DAILY HYDRATION</p><div class="hero-title">Every little sip counts.</div><strong>{p["percent"]:.0f}<span style="font-size:32px">%</span></strong><p>{p["total"]:,} of {model["goal"]:,} ml logged today</p></div><div class="ring" style="background:conic-gradient(#25866c {p["fill"]*360:.1f}deg,#c5ddcd 0deg)"><div class="ring-inner"><img alt="Water drop buddy {state}" src="data:image/svg+xml;base64,{svg}"></div></div></div>',unsafe_allow_html=True)
+    st.markdown(f'<div class="buddy"><div><p class="hero-label">YOUR DAILY HYDRATION</p><div class="hero-title">{reaction}</div><strong>{p["percent"]:.0f}<span style="font-size:32px">%</span></strong><p>{p["total"]:,} of {model["goal"]:,} ml logged today</p></div><div class="ring" style="background:conic-gradient(#25866c {p["fill"]*360:.1f}deg,#c5ddcd 0deg)"><div class="ring-inner"><img alt="Water drop buddy {state}" src="data:image/svg+xml;base64,{svg}"></div></div></div>',unsafe_allow_html=True)
     st.subheader("Log water")
     q1,q2,q3=st.columns(3)
-    q1.button("+100 ml",use_container_width=True,on_click=log,args=(100,"Small glass"))
-    q3.button("+500 ml",use_container_width=True,on_click=log,args=(500,"Bottle"))
-    q2.button("+250 ml",type="primary",use_container_width=True,on_click=log,args=(250,"Quick log"))
+    q1.button("+100 ml",disabled=p["total"]+100>LOG_LIMIT,use_container_width=True,on_click=log,args=(100,"Small glass"))
+    q3.button("+500 ml",disabled=p["total"]+500>LOG_LIMIT,use_container_width=True,on_click=log,args=(500,"Bottle"))
+    q2.button("+250 ml",disabled=p["total"]+250>LOG_LIMIT,type="primary",use_container_width=True,on_click=log,args=(250,"Quick log"))
     a,b,c=st.columns(3)
     a.metric("Water logged",f'{p["total"]:,} ml')
     b.metric("Still to go",f'{p["remaining"]:,} ml')
@@ -202,7 +213,7 @@ if nav=="Home":
     with st.expander("Add a custom amount"):
         with st.form("custom",clear_on_submit=False):
             amount=st.number_input("Custom amount (ml)",1,2000,250,1)
-            if st.form_submit_button("Add custom amount"):
+            if st.form_submit_button("Add custom amount",disabled=p["total"]+amount>LOG_LIMIT):
                 log(amount,"Custom"); st.rerun()
     with st.expander("Log from my glass or bottle"):
         cx,cy=st.columns(2)
@@ -212,7 +223,7 @@ if nav=="Home":
         size=st.session_state.get(container.lower(),300 if container=="Glass" else 1000)
         value=container_amount(size,f)
         st.caption(f"{size} ml × {fraction} = {value} ml (rounded to nearest ml)")
-        st.button(f"Log {value} ml",on_click=log,args=(value,f"{fraction} {container.lower()}"))
+        st.button(f"Log {value} ml",disabled=p["total"]+value>LOG_LIMIT,on_click=log,args=(value,f"{fraction} {container.lower()}"))
     u,r=st.columns(2)
     u.button("Undo last log",disabled=not model["days"][model["day"]]["logs"],on_click=undo,args=(model,),use_container_width=True)
     if r.button("New Day / Reset",use_container_width=True): st.session_state.confirm_reset=True

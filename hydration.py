@@ -2,6 +2,22 @@
 from datetime import date, timedelta
 import math
 
+LOG_LIMIT = 10000  # A software logging cap, not a recommended daily intake.
+BUDDY_LINES = {
+    "ready": ["Thirsty? Your buddy is on standby.", "The glass is empty. The potential is huge.", "New day. Fresh glass. Same tiny buddy.", "Waiting patiently. Practising my wave.", "Your first log gets this little guy moving."],
+    "start": ["A sip has entered the chat.", "Small glass. Main-character energy.", "Logged it. Tiny buddy approves.", "The progress ring has officially woken up.", "One less forgotten glass. Nice."],
+    "half": ["Halfway there. Cue the tiny wave.", "The glass is half full. So is the progress ring.", "Your buddy has upgraded to happy blob.", "A respectable amount of sipping has occurred.", "Halfway check-in: looking pretty good."],
+    "near": ["The finish line is getting a little wavy.", "Your buddy is preparing a very small celebration.", "Three-quarter energy. Full-time tiny buddy.", "Almost there. No speed-running required.", "The progress ring is looking rather pleased."],
+    "complete": ["Goal done. Put the leaderboard away.", "Achievement unlocked: knowing when enough is enough.", "Your buddy is doing a tiny victory dance.", "The ring is full. No bonus round needed.", "Daily goal complete. The aquarium can wait."],
+    "cap": ["Buddy, this is a water tracker, not an aquarium.", "Ten litres logged? Are we watering a whole forest?", "The log is full. We are not opening a swimming pool.", "Plot twist: your keyboard might be thirstier than you.", "The tiny buddy has called a timeout on the waterworks."]
+}
+
+def buddy_line(total, goal, count):
+    category = ("cap" if total >= LOG_LIMIT else "ready" if total == 0 else
+                "complete" if total >= goal else "near" if total >= goal*.75 else
+                "half" if total >= goal*.5 else "start")
+    return BUDDY_LINES[category][count % len(BUDDY_LINES[category])]
+
 AGE_GOALS = {"Children 4-8": 1200, "Young people 9-13": 1700,
              "Teens and adults 14-64": 2250, "Older adults 65+": 1800}
 TIPS = ["Keep a reusable bottle where you can see it.",
@@ -43,6 +59,8 @@ def add_water(model, amount, time, source="Quick log"):
         raise ValueError("Enter a valid amount.")
     if amount <= 0 or amount > 2000 or amount != int(amount):
         raise ValueError("Enter a whole amount from 1 to 2000 ml.")
+    if current(model)["total"] + amount > LOG_LIMIT:
+        raise ValueError("That would exceed the 10,000 ml logging cap. Check your entries or use Undo.")
     model["days"][model["day"]]["logs"].append({"ml":int(amount), "time":time, "source":source})
 
 def undo(model):
