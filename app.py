@@ -21,20 +21,40 @@ def alarm_wav():
 
 st.set_page_config(page_title="WaterBuddy",page_icon="💧",layout="wide")
 st.markdown("""<style>
-.stApp {background:linear-gradient(155deg,#edf9fa 0%,#f7fbff 60%,#f1f4fc 100%);color:#173c48}
-[data-testid="stMetricValue"],[data-testid="stMetricLabel"],.stRadio label {color:#173c48!important}
-[data-testid="stMetric"] {box-shadow:0 5px 20px #123d4908}
-@media(max-width:700px){.block-container{padding-left:1rem;padding-right:1rem}.buddy{gap:12px;padding:16px}.buddy strong{font-size:30px}}
-.block-container {max-width:1120px;padding-top:4rem;padding-bottom:2rem}
-h1,h2,h3 {color:#123d49!important;letter-spacing:-.035em}
-[data-testid="stMetric"] {background:white;border:1px solid #d8e9ed;border-radius:16px;padding:14px}
-[data-testid="stSidebar"] {background:#eaf5f6}
-.stButton>button {border-radius:12px;min-height:46px;font-weight:600}
-.stButton>button[kind="primary"] {background:#087e8b;border:0;color:white}
-.eyebrow {font-size:12px;font-weight:700;letter-spacing:.14em;color:#26737c}
-.buddy {display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap;
-background:white;border:1px solid #d8e9ed;border-radius:24px;padding:24px;margin:12px 0}
-.buddy p {margin:4px 0;color:#406671}.buddy strong {font-size:38px;color:#123d49}
+:root{--ink:#153c35;--teal:#12695a;--mint:#d9f2e7;--lavender:#eae4fa}
+.stApp{background:#f5f6f0;color:var(--ink)}
+.block-container{max-width:1180px;padding-top:3.5rem;padding-bottom:3rem}
+h1,h2,h3{color:var(--ink)!important;letter-spacing:-.045em}
+h1{font-size:3.1rem!important;font-weight:800!important}
+h3{font-size:1.35rem!important}
+[data-testid="stSidebar"]{background:#e9efe6;border-right:1px solid #dce4d7}
+[data-testid="stSidebar"] h3{font-size:1.6rem!important}
+[data-testid="stMetric"]{background:#fff;border:1px solid #e2e7dc;border-radius:20px;padding:20px 22px;box-shadow:0 6px 20px #123d4904}
+[data-testid="stMetricValue"]{color:var(--ink)!important;font-weight:650;font-size:1.9rem}
+[data-testid="stMetricLabel"]{color:#567166!important;font-size:.8rem}
+.stButton>button,.stDownloadButton>button{border-radius:14px;min-height:48px;border:1px solid #d4dfd1;font-weight:650;background:#fff;color:var(--ink);transition:transform .15s,box-shadow .15s}
+.stButton>button:hover,.stDownloadButton>button:hover{border-color:#12695a;transform:translateY(-1px);box-shadow:0 4px 12px #12695a12}
+.stButton>button[kind="primary"]{background:#12695a;color:white;border:1px solid #12695a}
+[data-testid="stRadio"]>div[role="radiogroup"]{gap:6px;background:#e7ece2;padding:6px;border-radius:17px;width:fit-content;margin-bottom:16px}
+[data-testid="stRadio"] label{padding:8px 20px!important;margin:0!important;border-radius:12px;color:#52685b!important;font-weight:600}
+[data-testid="stRadio"] label:has(input:checked){background:#fff;box-shadow:0 2px 8px #19392b12;color:#153c35!important}
+[data-testid="stRadio"] label>div:first-child{display:none}
+[data-testid="stExpander"]{border:1px solid #d9e2d3;border-radius:16px;background:#ffffff70}
+[data-testid="stForm"]{background:#fff;border:1px solid #e2e7dc;border-radius:18px}
+[data-testid="stProgressBar"] [role="progressbar"]{border-radius:10px}
+.eyebrow{font-size:11px;font-weight:750;letter-spacing:.17em;color:#62826b;margin-bottom:5px}
+.buddy{display:flex;align-items:center;justify-content:space-between;gap:24px;background:linear-gradient(125deg,#d9f2e7,#e4f1df 60%,#ede8fb);border-radius:28px;padding:32px 40px;margin:10px 0 20px;overflow:hidden}
+.buddy .hero-label{font-size:11px;font-weight:750;letter-spacing:.14em;color:#527968;margin:0 0 12px}
+.buddy strong{font-size:68px;line-height:1.05;color:#153c35;letter-spacing:-.06em}
+.buddy p{color:#456b59;margin:10px 0;font-size:14px}
+.buddy .hero-title{font-size:23px;font-weight:700;color:#153c35;letter-spacing:-.035em}
+.ring{width:170px;height:170px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ring-inner{width:148px;height:148px;background:#edf8ea;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 30px #ffffff90}
+.ring img{width:116px;filter:drop-shadow(0 9px 7px #12695a18)}
+.status-strip{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0 6px}
+.status-pill{background:#eee9fa;border-radius:30px;padding:7px 14px;color:#665580;font-size:12px;font-weight:600}
+@media(max-width:700px){.block-container{padding:3rem 1rem 2rem}.buddy{padding:24px;gap:14px;flex-wrap:wrap}.buddy strong{font-size:52px}.ring{width:145px;height:145px}.ring-inner{width:125px;height:125px}.ring img{width:100px}h1{font-size:2.4rem!important}[data-testid="stRadio"] label{padding:7px 10px!important}}
+@media(prefers-reduced-motion:reduce){.stButton>button{transition:none}}
 </style>""",unsafe_allow_html=True)
 
 def now():
@@ -68,11 +88,12 @@ def log(amount,source):
 
 with st.sidebar:
     st.markdown("### 💧 WaterBuddy")
-    st.caption("Your daily hydration companion")
+    st.caption("A little progress, every day.")
     st.selectbox("Age group",list(AGE_GOALS),key="age",on_change=age_changed)
     st.caption("Suggested starting goal: {:,} ml".format(AGE_GOALS[model["age"]]))
     st.number_input("My daily goal (ml)",min_value=250,max_value=5000,step=50,key="goal",on_change=goal_changed)
-    st.caption("Classroom presets are editable logging goals, not medical prescriptions. Ask a parent or clinician if you need help choosing a goal.")
+    with st.expander("About your goal"):
+        st.caption("These are editable classroom logging goals, not medical prescriptions. Ask a parent or clinician if you need help choosing one.")
     with st.expander("My containers"):
         st.number_input("Glass size (ml)",100,1000,300,25,key="glass")
         st.number_input("Bottle size (ml)",250,2000,1000,50,key="bottle")
@@ -92,7 +113,7 @@ with st.sidebar:
 
 st.markdown('<div class="eyebrow">DAILY WATER TRACKER</div>',unsafe_allow_html=True)
 st.title("WaterBuddy")
-st.write("Log your drinks and see how you are doing today.")
+st.caption("Your water. Your routine. One easy place to keep track.")
 nav=st.radio("Explore",["Home","Plan","Progress","Rewards","About"],horizontal=True,label_visibility="collapsed")
 p=current(model); stats=statistics(model)
 start=st.session_state.get("day_start",7); end=st.session_state.get("day_end",22)
@@ -106,32 +127,32 @@ def mascot_svg(state,fill):
            "wave":"M60 97 Q80 124 100 97","cheer":"M60 96 Q80 128 100 96",
            "complete":"M59 95 Q80 130 101 95"}[state]
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="168" height="178" viewBox="0 0 160 170" role="img" aria-label="Water drop buddy {state}">
-    <path d="M80 9 C70 37 24 63 24 103 A56 56 0 0 0 136 103 C136 63 90 37 80 9Z" fill="#35bfd1" stroke="#087e8b" stroke-width="4"/>
+    <path d="M80 9 C70 37 24 63 24 103 A56 56 0 0 0 136 103 C136 63 90 37 80 9Z" fill="#62c8a7" stroke="#25866c" stroke-width="4"/>
     <ellipse cx="58" cy="83" rx="5" ry="7" fill="#123d49"/><ellipse cx="102" cy="83" rx="5" ry="7" fill="#123d49"/>
-    <ellipse cx="47" cy="99" rx="9" ry="5" fill="#a4e6ec"/><ellipse cx="113" cy="99" rx="9" ry="5" fill="#a4e6ec"/>
+    <ellipse cx="47" cy="99" rx="9" ry="5" fill="#c8f4df"/><ellipse cx="113" cy="99" rx="9" ry="5" fill="#c8f4df"/>
     <path d="{mouth}" fill="none" stroke="#123d49" stroke-width="4" stroke-linecap="round"/>
     <path d="M23 115 Q8 110 12 {75 if state in ('wave','cheer','complete') else 126}" fill="none" stroke="#087e8b" stroke-width="5" stroke-linecap="round"/>
     <path d="M137 115 Q152 110 148 {75 if state in ('cheer','complete') else 126}" fill="none" stroke="#087e8b" stroke-width="5" stroke-linecap="round"/></svg>'''
 
 if nav=="Home":
     st.caption(now().strftime("%A %d %B %Y")+" · Log only what you drank")
+    state,message=milestone(p["percent"])
+    svg=base64.b64encode(mascot_svg(state,p["fill"]).encode()).decode()
+    st.markdown(f'<div class="buddy"><div><p class="hero-label">YOUR DAILY HYDRATION</p><div class="hero-title">Every little sip counts.</div><strong>{p["percent"]:.0f}<span style="font-size:32px">%</span></strong><p>{p["total"]:,} of {model["goal"]:,} ml logged today</p></div><div class="ring" style="background:conic-gradient(#25866c {p["fill"]*360:.1f}deg,#c5ddcd 0deg)"><div class="ring-inner"><img alt="Water drop buddy {state}" src="data:image/svg+xml;base64,{svg}"></div></div></div>',unsafe_allow_html=True)
+    st.subheader("Log water")
+    q1,q2,q3=st.columns(3)
+    q1.button("+100 ml",use_container_width=True,on_click=log,args=(100,"Small glass"))
+    q3.button("+500 ml",use_container_width=True,on_click=log,args=(500,"Bottle"))
+    q2.button("+250 ml",type="primary",use_container_width=True,on_click=log,args=(250,"Quick log"))
     a,b,c=st.columns(3)
     a.metric("Water logged",f'{p["total"]:,} ml')
     b.metric("Still to go",f'{p["remaining"]:,} ml')
     c.metric("My daily goal",f'{model["goal"]:,} ml')
-    state,message=milestone(p["percent"])
-    svg=base64.b64encode(mascot_svg(state,p["fill"]).encode()).decode()
-    st.markdown(f'<div class="buddy"><img width="168" alt="Water drop buddy {state}" src="data:image/svg+xml;base64,{svg}"><div><p>YOUR DAILY WATER BATTERY</p><strong>{p["percent"]:.1f}%</strong><p>{p["total"]:,} / {model["goal"]:,} ml</p></div></div>',unsafe_allow_html=True)
     st.progress(p["fill"],text=message)
     st.caption(f'Suggested starting goal: {AGE_GOALS[model["age"]]:,} ml · Your intake is {p["total"]/AGE_GOALS[model["age"]]*100:.1f}% of that starting goal. Your selected goal is {model["goal"]:,} ml.')
     if p["percent"]>=100: st.success("Daily goal complete. Rewards are capped; more drinking is not a challenge.")
-    st.subheader("Log water")
-    q1,q2=st.columns(2)
-    q1.button("+100 ml",use_container_width=True,on_click=log,args=(100,"Small glass"))
-    q2.button("+500 ml",use_container_width=True,on_click=log,args=(500,"Bottle"))
-    x,y=st.columns([1,2])
-    x.button("+250 ml",type="primary",use_container_width=True,on_click=log,args=(250,"Quick log"))
-    with y:
+    st.markdown(f'<div class="status-strip"><span class="status-pill">{stats["streak"]} day streak</span><span class="status-pill">{stats["points"]} AquaPoints</span><span class="status-pill">Your own pace</span></div>',unsafe_allow_html=True)
+    with st.expander("Add a custom amount"):
         with st.form("custom",clear_on_submit=False):
             amount=st.number_input("Custom amount (ml)",1,2000,250,1)
             if st.form_submit_button("Add custom amount"):
