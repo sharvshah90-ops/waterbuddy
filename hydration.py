@@ -12,7 +12,22 @@ BUDDY_LINES = {
     "cap": ["Buddy, this is a water tracker, not an aquarium.", "Ten litres logged? Are we watering a whole forest?", "The log is full. We are not opening a swimming pool.", "Plot twist: your keyboard might be thirstier than you.", "The tiny buddy has called a timeout on the waterworks."]
 }
 
+# Keep the collection at 30 lines, including reactions before the cap.
+for _group in ("ready", "start", "half", "near", "complete"):
+    BUDDY_LINES[_group] = BUDDY_LINES[_group][:4]
+BUDDY_LINES["extra"] = [
+    "The goal is done. You can stop watching the credits now.",
+    "Bonus round? This buddy did not sign up for that.",
+    "Are we logging glasses or filling a paddling pool?",
+    "Your bottle has requested a union representative.",
+    "The aquarium called. It wants its water back."
+]
+
 def buddy_line(total, goal, count):
+    if total < LOG_LIMIT and total >= goal*1.25:
+        ratio=total/goal
+        level=0 if ratio<1.5 else 1 if ratio<2 else 2 if ratio<3 else 3 if ratio<4 else 4
+        return BUDDY_LINES["extra"][level]
     category = ("cap" if total >= LOG_LIMIT else "ready" if total == 0 else
                 "complete" if total >= goal else "near" if total >= goal*.75 else
                 "half" if total >= goal*.5 else "start")
